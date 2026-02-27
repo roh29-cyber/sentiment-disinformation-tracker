@@ -1,8 +1,13 @@
+import os
 import requests
 from bs4 import BeautifulSoup
 import logging
+from dotenv import load_dotenv
 
+load_dotenv()
 logger = logging.getLogger(__name__)
+
+FIRECRAWL_API_KEY = os.getenv("FIRECRAWL_API_KEY", "")
 
 HEADERS = {
     "User-Agent": (
@@ -12,6 +17,36 @@ HEADERS = {
     )
 }
 
+
+# ─── Firecrawl (primary scraper when API key available) ──────────────────────
+
+def scrape_with_firecrawl(url: str) -> str:
+    """Scrape page content using Firecrawl API — returns clean markdown/text."""
+    if not FIRECRAWL_API_KEY:
+        return ""
+    try:
+        from firecrawl import FirecrawlApp
+        app = FirecrawlApp(api_key=FIRECRAWL_API_KEY)
+        result = app.scrape_url(url, params={
+            "formats": ["markdown"],
+            "onlyMainContent": True,
+            "timeout": 30000,
+        })
+        # result is a dict with 'markdown' key
+        text = ""
+        if isinstance(result, dict):
+            text = result.get("markdown", "") or result.get("content", "") or ""
+        elif hasattr(result, "markdown"):
+            text = result.markdown or ""
+        if text:
+            logger.info(f"Firecrawl scraped {url}: {len(text)} chars")
+        return text
+    except Exception as e:
+        logger.warning(f"Firecrawl scrape failed for {url}: {e}")
+        return ""
+
+
+# ─── Fallback scrapers ───────────────────────────────────────────────────────
 
 def scrape_with_requests(url: str, timeout: int = 10) -> str:
     """Scrape page content using requests + BeautifulSoup."""
@@ -56,10 +91,22 @@ def scrape_with_playwright(url: str) -> str:
         return ""
 
 
+# ─── Main entry point ────────────────────────────────────────────────────────
+
 def scrape_url(url: str) -> str:
-    """Try BeautifulSoup first, fall back to Playwright if content is empty."""
+    """Scrape a URL using Firecrawl first, then BS4, then Playwright."""
+    # 1. Firecrawl (best quality — clean markdown, handles JS)
+    if FIRECRAWL_API_KEY:
+        text = scrape_with_firecrawl(url)
+        if text and len(text) > 100:
+            return text[:15000]
+
+    # 2. Requests + BeautifulSoup (fast, free)
     text = scrape_with_requests(url)
-    if not text or len(text) < 100:
-        logger.info(f"Falling back to Playwright for {url}")
-        text = scrape_with_playwright(url)
-    return text[:15000]  # Cap at 15k chars to avoid overload
+    if text and len(text) > 100:
+        return text[:15000]
+
+    # 3. Playwright (last resort for JS-heavy sites)
+    logger.info(f"Falling back to Playwright for {url}")
+    text = scrape_with_playwright(url)
+    return text[:15000]

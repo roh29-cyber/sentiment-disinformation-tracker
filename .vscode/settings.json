@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd \"c:\\\\Users\\\\rohan\\\\sentiment detector\\\\backend\"; python -c \"from google import genai; print\\('google-genai OK'\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

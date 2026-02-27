@@ -10,6 +10,10 @@ import RelatedArticles from './components/RelatedArticles.jsx';
 import FactChecks from './components/FactChecks.jsx';
 import Entities from './components/Entities.jsx';
 import CrossCheckResults from './components/CrossCheckResults.jsx';
+import ScorePanel from './components/ScorePanel.jsx';
+import EvidenceSummary from './components/EvidenceSummary.jsx';
+import NewsCoverage from './components/NewsCoverage.jsx';
+import GeminiAnalysis from './components/GeminiAnalysis.jsx';
 import LoadingSpinner from './components/LoadingSpinner.jsx';
 import ErrorAlert from './components/ErrorAlert.jsx';
 
@@ -96,14 +100,43 @@ export default function App() {
             </div>
 
             {/* Risk Alert — full width */}
-            <RiskAlert riskLevel={result.risk_level} inputType={result.input_type} />
+            <RiskAlert riskLevel={result.risk_level} inputType={result.input_type}
+                       misinformationScore={result.misinformation_score}
+                       confidence={result.confidence} />
+
+            {/* Evidence Summary */}
+            {result.summary && (
+              <EvidenceSummary summary={result.summary} sourcesChecked={result.sources_checked} />
+            )}
+
+            {/* News Coverage from NewsAPI */}
+            {result.cross_check && (
+              <NewsCoverage crossCheck={result.cross_check} />
+            )}
+
+            {/* Gemini AI Analysis */}
+            {result.gemini_analysis && (
+              <GeminiAnalysis geminiData={result.gemini_analysis} />
+            )}
+
+            {/* Score Gauges + Cross-Check */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <ScorePanel
+                misinformationScore={result.misinformation_score}
+                reputationScore={result.reputation_risk_score}
+                reputationLevel={result.reputation_risk_level}
+                confidence={result.confidence}
+              />
+              <TrustScore score={result.source_trust_score} />
+            </div>
+
             {/* Cross-Platform Verification — full width */}
             {result.cross_check && (
               <CrossCheckResults crossCheck={result.cross_check} />
             )}
+
             {/* Metrics Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <TrustScore score={result.source_trust_score} />
               <SimilarityScore score={result.similarity_score} />
             </div>
 

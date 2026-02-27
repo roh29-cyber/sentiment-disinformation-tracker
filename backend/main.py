@@ -11,6 +11,7 @@ from coordination import detect_coordination
 from risk import compute_risk
 from related import fetch_related_info, get_topic_urls
 from cross_check import cross_check_content
+from gemini_analysis import analyze_with_gemini
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -145,16 +146,62 @@ async def analyze(request: AnalyzeRequest):
     # -- Step 8: Related information --
     related = fetch_related_info(query, content)
 
+    # -- Step 8.5: Gemini AI analysis --
+    logger.info("Running Gemini AI analysis...")
+    gemini_result = analyze_with_gemini(query, cross_check, sentiment, risk_result["risk_level"])
+    if gemini_result:
+        logger.info(f"Gemini verdict: {gemini_result.get('verdict', 'N/A')}")
+    else:
+        logger.info("Gemini analysis skipped or failed")
+
+    # -- Step 8.6: Gemini verdict OVERRIDES risk level (highest priority) --
+    final_risk_level = risk_result["risk_level"]
+    final_reasons = list(risk_result["reasons"])
+
+    if gemini_result:
+        gv = (gemini_result.get("verdict") or "").upper().strip()
+        gemini_analysis_text = gemini_result.get("analysis", "")
+
+        if gv in ("FALSE", "MISLEADING"):
+            if final_risk_level != "HIGH":
+                final_risk_level = "HIGH"
+                final_reasons.insert(
+                    0, f"Gemini AI analysis verdict: {gv}. {gemini_analysis_text[:200]}"
+                )
+                logger.info(f"Gemini override: risk escalated to HIGH (verdict={gv})")
+
+        elif gv in ("UNVERIFIED", "PARTIALLY TRUE"):
+            if final_risk_level == "LOW":
+                final_risk_level = "MEDIUM"
+                final_reasons.insert(
+                    0, f"Gemini AI analysis verdict: {gv}. {gemini_analysis_text[:200]}"
+                )
+                logger.info(f"Gemini override: risk escalated to MEDIUM (verdict={gv})")
+
+        # Recalculate summary with updated risk level
+        if final_risk_level != risk_result["risk_level"]:
+            risk_result["summary"] = (
+                f"Gemini AI analysis flagged this content as {gv}. "
+                + risk_result["summary"]
+            )
+
     # -- Step 9: Build response --
     return {
         "input_type": input_type,
         "source_trust_score": source_trust_score,
         "sentiment": sentiment,
         "similarity_score": similarity_score,
-        "risk_level": risk_result["risk_level"],
-        "reasons": risk_result["reasons"],
+        "risk_level": final_risk_level,
+        "reasons": final_reasons,
+        "misinformation_score": risk_result["misinformation_score"],
+        "reputation_risk_score": risk_result["reputation_risk_score"],
+        "reputation_risk_level": risk_result["reputation_risk_level"],
+        "confidence": risk_result["confidence"],
+        "summary": risk_result["summary"],
         "related": related,
         "cross_check": cross_check,
+        "sources_checked": source_urls,
+        "gemini_analysis": gemini_result,
     }
 
 

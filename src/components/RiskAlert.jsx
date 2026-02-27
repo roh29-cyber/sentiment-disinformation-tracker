@@ -27,7 +27,7 @@ const RISK_CONFIG = {
   },
 };
 
-export default function RiskAlert({ riskLevel, inputType }) {
+export default function RiskAlert({ riskLevel, inputType, misinformationScore, confidence }) {
   const config = RISK_CONFIG[riskLevel] || RISK_CONFIG.LOW;
 
   return (
@@ -43,6 +43,16 @@ export default function RiskAlert({ riskLevel, inputType }) {
           <span className={`${config.badge} text-white text-xs font-bold px-3 py-1 rounded-full uppercase`}>
             {riskLevel}
           </span>
+          {misinformationScore !== undefined && (
+            <span className={`${config.border} border text-xs font-bold px-3 py-1 rounded-full ${config.text}`}>
+              Score: {misinformationScore}/100
+            </span>
+          )}
+          {confidence && (
+            <span className="text-gray-400 text-xs bg-gray-700/60 px-2.5 py-1 rounded-full">
+              Confidence: {confidence}
+            </span>
+          )}
           <span className="text-gray-400 text-sm">
             Input type: <span className="text-gray-200 font-medium capitalize">{inputType}</span>
           </span>
