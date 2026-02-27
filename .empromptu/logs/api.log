@@ -1,0 +1,45 @@
+INFO:     Started server process [1512]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:4833 (Press CTRL+C to quit)
+INFO:main:Analyzing input: rashmika
+INFO:main:Input type detected: text
+INFO:related:Using mock Serper data
+INFO:main:Top URLs from search: ['https://reuters.com/world/analysis', 'https://bbc.com/news/world', 'https://apnews.com/article/sample']
+WARNING:scraper:requests scrape failed for https://reuters.com/world/analysis: 401 Client Error: HTTP Forbidden for url: https://www.reuters.com/world/analysis
+INFO:scraper:Falling back to Playwright for https://reuters.com/world/analysis
+WARNING:scraper:Playwright scrape failed for https://reuters.com/world/analysis: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+WARNING:scraper:requests scrape failed for https://apnews.com/article/sample: 404 Client Error: Not Found for url: https://apnews.com/article/sample
+INFO:scraper:Falling back to Playwright for https://apnews.com/article/sample
+WARNING:scraper:Playwright scrape failed for https://apnews.com/article/sample: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+INFO:main:Source trust score: 1.0
+INFO:main:Sentiment: {'positive': 25, 'neutral': 19, 'negative': 56}
+INFO:main:Similarity score: 0.1403
+INFO:main:Risk level: HIGH
+INFO:related:Using mock Serper data
+INFO:related:Using mock NewsAPI data
+INFO:     172.20.0.1:0 - "POST /analyze HTTP/1.1" 200 OK
+INFO:main:Analyzing input: climate change misinformation
+INFO:main:Input type detected: text
+INFO:related:Using mock Serper data
+INFO:main:Top URLs from search: ['https://reuters.com/world/analysis', 'https://bbc.com/news/world', 'https://apnews.com/article/sample']
+WARNING:scraper:requests scrape failed for https://reuters.com/world/analysis: 401 Client Error: HTTP Forbidden for url: https://www.reuters.com/world/analysis
+INFO:scraper:Falling back to Playwright for https://reuters.com/world/analysis
+WARNING:scraper:Playwright scrape failed for https://reuters.com/world/analysis: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+WARNING:scraper:requests scrape failed for https://apnews.com/article/sample: 404 Client Error: Not Found for url: https://apnews.com/article/sample
+INFO:scraper:Falling back to Playwright for https://apnews.com/article/sample
+WARNING:scraper:Playwright scrape failed for https://apnews.com/article/sample: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+INFO:main:Source trust score: 1.0
+INFO:main:Sentiment: {'positive': 25, 'neutral': 19, 'negative': 56}
+INFO:main:Similarity score: 0.1402
+INFO:main:Risk level: HIGH
+INFO:related:Using mock Serper data
+INFO:related:Using mock NewsAPI data
+INFO:     172.20.0.1:0 - "POST /analyze HTTP/1.1" 200 OK
+WARNING:  Invalid HTTP request received.
+INFO:     172.20.0.1:0 - "GET / HTTP/1.1" 200 OK
+WARNING:  Invalid HTTP request received.

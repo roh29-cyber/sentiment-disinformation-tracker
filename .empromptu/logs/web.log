@@ -1,0 +1,9 @@
+
+> narrative-risk-frontend@1.0.0 dev
+> vite --host --port 4832
+
+
+  VITE v5.4.21  ready in 690 ms
+
+  â  Local:   http://localhost:4832/
+  â  Network: http://172.20.0.48:4832/

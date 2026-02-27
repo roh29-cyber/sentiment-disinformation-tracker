@@ -1,0 +1,14 @@
+{
+  "processes": {
+    "web": {
+      "setup": "npm install",
+      "command": "npm run dev -- --host --port 4832",
+      "port": 4832
+    },
+    "api": {
+      "setup": "pip install fastapi uvicorn vaderSentiment scikit-learn numpy requests beautifulsoup4 python-dotenv httpx lxml spacy playwright && python -m spacy download en_core_web_sm && python -m playwright install chromium",
+      "command": "cd backend && uvicorn main:app --host 0.0.0.0 --port 4833",
+      "port": 4833
+    }
+  }
+}
